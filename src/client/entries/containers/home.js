@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import HomeLayout from '../components/home-layout'
 import Menu from '../../menu/containers/menu'
+import Form from '../../form/components/form'
+import Table from '../../table/components/table'
+import Container from '../../form/components/container'
 
 export default class Home extends Component {
   state = {
@@ -24,6 +27,7 @@ export default class Home extends Component {
       })
         .then(res => res.json())
         .then(data => {
+          console.log(data)
           M.toast({html:'TASK UPDATED'})
 
           this.setState({ _id: '', title: '', description: ''})
@@ -41,6 +45,7 @@ export default class Home extends Component {
       })
         .then(res => res.json())
         .then(data => {
+          console.log(data)
           M.toast({html:'TASK SAVED'})
           
           this.setState({ title: '', description:'' })
@@ -92,7 +97,6 @@ export default class Home extends Component {
   }
 
   componentDidMount(){
-    console.log('Component is mount')
     this.getTasks()
   }
 
@@ -119,66 +123,10 @@ export default class Home extends Component {
     return(
       <HomeLayout>
         <Menu />
-        
-        <div className="container">
-          <div className="row">
-            <div className="col s5">
-              <div className="card">
-                <div className="card-content">
-                  <form onSubmit={this.handleAddTask}>
-                    <div className="row">
-                      <div className="input-field col s12">
-                          <input type="text" placeholder="Task title" name="title" onChange={this.handleChange} value={this.state.title} required></input>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="input-field col s12">
-                        <textarea name="description" onChange={this.handleChange} placeholder="Task description..." className="materialize-textarea" value={this.state.description} required></textarea>
-                      </div>
-                    </div>
-                    {
-                      this.state._id ? 
-                        <button className="btn light-blue darken-4" type="submit">UPDATE</button>
-                        :
-                        <button className="btn light-blue darken-4" type="submit">ADD</button>
-                    }
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <div className="col s7">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    this.state.tasks.map(task => {
-                      return (
-                        <tr key={task._id}>
-                          <td>{task.title}</td>
-                          <td>{task.description}</td>
-                          <td>
-                            <button className="btn green darken-4" style={{margin: '4px'}} onClick={() => this.handleEditTask(task)}>
-                              <i className="material-icons">edit</i>
-                            </button>
-                            <button className="btn red darken-4" onClick={() => this.handleDeleteTask(task._id)}>
-                              <i className="material-icons">delete</i>
-                            </button>
-                          </td>
-                        </tr>
-                      )
-                    })
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <Container>
+          <Form _id={this.state._id} title={this.state.title} description={this.state.description} handleChange={this.handleChange} handleAddTask={this.handleAddTask}/>
+          <Table tasks={this.state.tasks} handleDeleteTask={this.handleDeleteTask} handleEditTask={this.handleEditTask} />
+        </Container>
       </HomeLayout>
     )
   }
