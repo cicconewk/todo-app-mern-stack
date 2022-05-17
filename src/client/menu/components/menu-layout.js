@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
-export default function MenuLayout(props){
-  return(
-    <nav className="light-blue darken-4">
-      {props.children}
-    </nav>
-  )
+function MenuLayout({ children }) {
+  return <nav className="light-blue darken-4">{children}</nav>;
 }
+
+export default MenuLayout;

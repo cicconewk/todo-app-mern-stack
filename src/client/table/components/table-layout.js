@@ -1,19 +1,20 @@
-import React from 'react'
+import React from "react";
 
-export default function TableLayout(props){
-  return(
+function TableLayout({ rows, children }) {
+  return (
     <div className="col s7">
       <table>
         <thead>
           <tr>
-            <th>{props.th1}</th>
-            <th>{props.th2}</th>
+            {rows?.map((row) => (
+              <th key={row.id}>{row.label}</th>
+            ))}
           </tr>
         </thead>
-        <tbody>
-          {props.children}
-        </tbody>
+        <tbody>{children}</tbody>
       </table>
     </div>
-  )
+  );
 }
+
+export default TableLayout;

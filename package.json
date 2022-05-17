@@ -6,27 +6,35 @@
   "scripts": {
     "start": "node src/index.js",
     "server": "nodemon src/index.js",
-    "build:dev": "webpack  --mode development --watch"
+    "serve": "webpack serve --mode development",
+    "build": "webpack --mode production"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "4.16.4",
-    "mongoose": "5.4.1",
-    "morgan": "1.9.1",
-    "prop-types": "^15.6.2",
-    "react": "16.7.0",
-    "react-dom": "16.7.0"
+    "@babel/runtime": "^7.17.9",
+    "express": "4.18.1",
+    "mongoose": "^6.3.3",
+    "morgan": "1.10.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.2.2",
-    "@babel/plugin-proposal-class-properties": "7.2.3",
-    "@babel/preset-env": "7.2.3",
-    "@babel/preset-react": "7.0.0",
-    "babel-loader": "8.0.4",
-    "nodemon": "1.18.9",
-    "webpack": "4.28.2",
-    "webpack-cli": "3.1.2"
+    "@babel/core": "^7.17.12",
+    "@babel/plugin-proposal-class-properties": "7.17.12",
+    "@babel/plugin-transform-runtime": "^7.17.12",
+    "@babel/preset-env": "^7.17.12",
+    "@babel/preset-react": "^7.17.12",
+    "babel-loader": "^8.2.5",
+    "css-loader": "^6.7.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "nodemon": "2.0.16",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
   }
 }

@@ -1,133 +1,122 @@
-import React, { Component } from 'react'
-import HomeLayout from '../components/home-layout'
-import Menu from '../../menu/containers/menu'
-import Form from '../../form/components/form'
-import Table from '../../table/components/table'
-import Container from '../../form/components/container'
+import React, { useState, useEffect } from "react";
 
-export default class Home extends Component {
-  state = {
-    _id: '',
-    title: '',
-    description: '',
-    tasks: []
-  }
+import HomeLayout from "../components/home-layout";
+import Menu from "../../menu/containers/menu";
+import Form from "../../form/components/form";
+import Table from "../../table/components/table";
+import Container from "../../form/components/container";
+import { removeTask, setTask, useGetTasks } from "../../services/tasks";
+import { Status } from "../../constants";
 
-  handleAddTask = (e) => {
-    let id = this.state._id
+const FORM_INITIAL_VALUES = {
+  id: "",
+  title: "",
+  description: "",
+};
 
-    if(id){
-      fetch(`/api/tasks/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(this.state),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log(data)
-          M.toast({html:'TASK UPDATED'})
+function Home() {
+  const [formValues, setFormValues] = useState(FORM_INITIAL_VALUES);
+  const [shouldUpdate, setShouldUpdate] = useState(false);
+  const [isFormLoading, setIsFormLoading] = useState(false);
 
-          this.setState({ _id: '', title: '', description: ''})
-          this.getTasks()
-        })
-        .catch(err => console.error(err))
-    }else{
-      fetch('/api/tasks', {
-        method: 'POST',
-        body: JSON.stringify(this.state),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log(data)
-          M.toast({html:'TASK SAVED'})
-          
-          this.setState({ title: '', description:'' })
-          this.getTasks()
-        })
-        .catch(err => console.error(err))
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+
+    setIsFormLoading(true);
+    try {
+      const { id, title, description } = formValues;
+      const result = await setTask(
+        id,
+        {
+          title,
+          description,
+        },
+        Boolean(id) ? "PUT" : "POST",
+      );
+
+      if (result.status === Status.OK) {
+        setFormValues(FORM_INITIAL_VALUES);
+        setFormValues(result?.data);
+      }
+    } catch (error) {
+      // TODO: catch and handle promise exeception
     }
 
-    e.preventDefault()
-  }
+    setIsFormLoading(false);
+  };
 
-  handleDeleteTask = (id) => {
-    if(confirm("Are you sure you want to delete this task?")){
-      fetch(`/api/tasks/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Assets': 'application/json',
-          'Content-Type': 'application/json'
+  const handleDeleteTask = async (id) => {
+    try {
+      const confirmation = confirm(
+        "Are you sure you want to delete this task?",
+      );
+
+      if (confirmation && Boolean(id)) {
+        const result = await removeTask(id);
+
+        if (result.status === Status.OK) {
+          M.toast({ html: "TASK DELETED" });
+        } else {
+          M.toast({
+            html: "There was an unexpected error while deleting the task",
+          });
         }
-      })
-        .then(res => res.json())
-        .then(data => console.log(data))
-        .catch(err => console.error(err))
-
-        M.toast({html: "TASK DELETED"})
-        this.getTasks()
-    }else{
-      M.toast({html: "ACTION CANCELED"})
+      }
+    } catch (error) {
+      // TODO: catch the exception
+      M.toast({ html: "ACTION CANCELED" });
     }
 
-    if(this.state._id){
-      this.setState({
-        _id: '',
-        title: '',
-        description: ''
-      })
-    }
-    
-  }
+    setFormValues((previous) => ({
+      ...FORM_INITIAL_VALUES,
+      tasks: previous.tasks,
+    }));
+  };
 
-  handleEditTask = (task) => {
-    const { _id, title, description } = task
+  const handleEditTask = ({ id, title, description }) => {
+    setFormValues({
+      id,
+      title,
+      description,
+    });
+  };
 
-    this.setState({
-      _id: _id,
-      title: title,
-      description: description
-    })
-  }
+  const handleChange = ({ target: { name, value } }) => {
+    setFormValues((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
 
-  componentDidMount(){
-    this.getTasks()
-  }
+  const [tasks, isFetchingTasks, _, getTasks] = useGetTasks(shouldUpdate, () =>
+    setShouldUpdate(false),
+  );
 
-  getTasks = () => {
-    fetch('/api/tasks')
-      .then(res => res.json())
-      .then(data => {
-        this.setState({
-          tasks: data
-        })
-      })
-      .catch(err => console.error(err))
-  }
+  useEffect(() => {
+    getTasks();
+  }, []);
 
-  handleChange = (e) => {
-    const { name, value } = e.target
-
-    this.setState({
-      [name]: value
-    })
-  }
-
-  render() {
-    return(
-      <HomeLayout>
-        <Menu />
-        <Container>
-          <Form _id={this.state._id} title={this.state.title} description={this.state.description} handleChange={this.handleChange} handleAddTask={this.handleAddTask}/>
-          <Table tasks={this.state.tasks} handleDeleteTask={this.handleDeleteTask} handleEditTask={this.handleEditTask} />
-        </Container>
-      </HomeLayout>
-    )
-  }
+  return (
+    <HomeLayout>
+      <Menu />
+      <Container>
+        <Form
+          id={formValues.id}
+          title={formValues.title}
+          description={formValues.description}
+          onChange={handleChange}
+          onSubmit={handleAddTask}
+          isLoading={isFormLoading}
+        />
+        <Table
+          tasks={tasks}
+          onDelete={handleDeleteTask}
+          onEdit={handleEditTask}
+          isLoading={isFetchingTasks}
+        />
+      </Container>
+    </HomeLayout>
+  );
 }
+
+export default Home;

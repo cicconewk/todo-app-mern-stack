@@ -1,5 +1,9 @@
-import React from 'react'
-import { render } from 'react-dom'
-import Home from './entries/containers/home'
+import React from "react";
+import { createRoot } from "react-dom/client";
 
-render(<Home />, document.getElementById("app"))
+import Home from "./entries/containers/home";
+
+const container = document.getElementById("app");
+const root = createRoot(container);
+
+root.render(<Home />);

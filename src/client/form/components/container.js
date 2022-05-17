@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
-export default function Container(props){
-  return(
+function Container({ children }) {
+  return (
     <div className="container">
-      <div className="row">
-        { props.children }
-      </div>
+      <div className="row">{children}</div>
     </div>
-  )
+  );
 }
+
+export default Container;
